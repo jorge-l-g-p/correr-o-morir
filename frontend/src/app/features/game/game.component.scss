@@ -1,0 +1,24 @@
+/* ── GameComponent styles ───────────────────────────────────────────────── */
+
+.game-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #0f0c29;
+  overflow: hidden;
+}
+
+app-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+app-game-engine {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}

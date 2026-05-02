@@ -1,0 +1,62 @@
+<div class="selection-screen">
+
+  <header class="header">
+    <h1 class="title">
+      <span class="title-run">CORRER</span>
+      <span class="title-or">o</span>
+      <span class="title-die">MORIR</span>
+    </h1>
+    <p class="subtitle">Recoge frutos, esquiva trampas y autos. Gana quien tenga mas puntos en 3 minutos.</p>
+  </header>
+
+  <section class="players-section">
+
+    <!-- Jugador 1 -->
+    <div class="player-card player-card--p1">
+      <div class="player-avatar" style="background:#FF6B35">🏃</div>
+      <h2>Jugador 1 <span class="controls-hint">WASD</span></h2>
+      <input
+        type="text"
+        placeholder="Tu nombre..."
+        maxlength="16"
+        class="name-input"
+        [value]="name1()"
+        (input)="name1.set($any($event.target).value)"
+      />
+    </div>
+
+    <!-- VS -->
+    <div class="vs-badge">VS</div>
+
+    <!-- Jugador 2 -->
+    <div class="player-card player-card--p2">
+      <div class="player-avatar" style="background:#4ECDC4">🏃</div>
+      <h2>Jugador 2 <span class="controls-hint">Flechas</span></h2>
+      <input
+        type="text"
+        placeholder="Tu nombre..."
+        maxlength="16"
+        class="name-input"
+        [value]="name2()"
+        (input)="name2.set($any($event.target).value)"
+      />
+    </div>
+
+  </section>
+
+  @if (errorMsg()) {
+    <p class="error-msg" role="alert">{{ errorMsg() }}</p>
+  }
+
+  <button class="play-btn" (click)="startGame()">
+    Jugar
+  </button>
+
+  <div class="rules">
+    <span>🍎 Frutos = +VIT +pts</span>
+    <span>⚠️ Trampas = -VIT</span>
+    <span>🚗 Autos = -VIT</span>
+    <span>⏱ 3 minutos</span>
+  </div>
+
+</div>

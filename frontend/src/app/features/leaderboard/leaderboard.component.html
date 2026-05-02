@@ -1,0 +1,32 @@
+<!-- Pantalla de leaderboard -->
+<div class="leaderboard-screen">
+
+  <header class="header">
+    <a routerLink="/" class="back-btn" aria-label="Volver al menú">← Volver</a>
+    <h1>🏆 Tabla de Líderes</h1>
+    <p>Los mejores corredores de la ciudad</p>
+  </header>
+
+  @if (loading()) {
+    <div class="loading" aria-live="polite">Cargando...</div>
+  }
+
+  @if (errorMsg()) {
+    <div class="error" role="alert">{{ errorMsg() }}</div>
+  }
+
+  @if (!loading() && !errorMsg()) {
+    <ol class="leaderboard-list" aria-label="Top 10 jugadores">
+      @for (player of players(); track player.id; let i = $index) {
+        <li class="leaderboard-item" [class.top-three]="i < 3">
+          <span class="rank">{{ medal(i) }}</span>
+          <span class="username">{{ player.username }}</span>
+          <span class="character">{{ player.characterId }}</span>
+          <span class="score">{{ player.highScore | number }} pts</span>
+          <span class="games">{{ player.totalGames }} partidas</span>
+        </li>
+      }
+    </ol>
+  }
+
+</div>

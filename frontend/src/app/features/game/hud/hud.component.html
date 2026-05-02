@@ -1,0 +1,42 @@
+<!-- HUD superpuesto sobre el canvas del juego -->
+<div class="hud" role="status" aria-label="Estado del juego">
+
+  <!-- Jugador 1 (izquierda) -->
+  <div class="player-panel player-panel--local">
+    <span class="player-label" style="color:#FF6B35">{{ j1Name() }}</span>
+    <div class="vitality-bar" aria-label="Vitalidad J1">
+      <div
+        class="vitality-fill"
+        [style.width.%]="j1Vitality()"
+        [style.background]="j1VitalityColor()"
+      ></div>
+    </div>
+    <div class="stats-row">
+      <span class="vitality-value">{{ j1Vitality() | number:'1.0-0' }}%</span>
+      <span class="score">{{ j1Score() }} pts</span>
+    </div>
+  </div>
+
+  <!-- Tiempo central -->
+  <div class="center-panel">
+    <span class="timer" aria-label="Tiempo transcurrido">{{ timeDisplay() }}</span>
+    <span class="goal-hint">META al norte</span>
+  </div>
+
+  <!-- Jugador 2 (derecha) -->
+  <div class="player-panel player-panel--opponent">
+    <span class="player-label" style="color:#4ECDC4">{{ j2Name() }}</span>
+    <div class="vitality-bar" aria-label="Vitalidad J2">
+      <div
+        class="vitality-fill"
+        [style.width.%]="j2Vitality()"
+        [style.background]="j2VitalityColor()"
+      ></div>
+    </div>
+    <div class="stats-row">
+      <span class="vitality-value">{{ j2Vitality() | number:'1.0-0' }}%</span>
+      <span class="score">{{ j2Score() }} pts</span>
+    </div>
+  </div>
+
+</div>

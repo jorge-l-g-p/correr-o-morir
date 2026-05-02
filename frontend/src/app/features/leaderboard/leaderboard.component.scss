@@ -1,0 +1,77 @@
+/* ── Leaderboard styles ─────────────────────────────────────────────────── */
+
+.leaderboard-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+
+  h1 { font-size: 2.5rem; margin: 0.5rem 0; }
+  p  { color: rgba(255,255,255,0.6); margin: 0; }
+}
+
+.back-btn {
+  display: inline-block;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s;
+
+  &:hover { color: #ff6b35; }
+}
+
+.loading, .error {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2rem;
+}
+
+.error { color: #e63946; }
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.leaderboard-item {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.1); }
+
+  &.top-three {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(255, 215, 0, 0.07);
+  }
+}
+
+.rank     { font-size: 1.3rem; }
+.username { font-weight: 700; font-size: 1rem; }
+.character { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.score    { font-weight: 800; color: #ffd700; font-size: 1rem; }
+.games    { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
