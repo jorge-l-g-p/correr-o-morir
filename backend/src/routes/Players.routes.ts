@@ -47,7 +47,8 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const rawId = req.params['id'];
+    const id = parseInt(Array.isArray(rawId) ? rawId[0] : rawId, 10);
     if (isNaN(id) || id <= 0) {
       return res.status(400).json({ success: false, message: 'ID inválido' });
     }
