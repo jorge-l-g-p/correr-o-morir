@@ -1,15 +1,21 @@
 /**
  * Configuración del pool de conexiones PostgreSQL.
- * Usa pg.Pool para reutilizar conexiones eficientemente.
+ * Las credenciales SIEMPRE vienen de variables de entorno.
+ * Nunca hay valores por defecto de contraseñas en código.
  */
 import { Pool } from 'pg';
 
+if (!process.env.DB_PASSWORD) {
+  console.error('ERROR: DB_PASSWORD no está definida en las variables de entorno');
+  process.exit(1);
+}
+
 export const pool = new Pool({
-  host:     process.env.DB_HOST     || 'localhost',
+  host:     process.env.DB_HOST || 'localhost',
   port:     Number(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME     || 'correr_morir',
-  user:     process.env.DB_USER     || 'postgres',
-  password: process.env.DB_PASSWORD || 'GamePass2026',
+  database: process.env.DB_NAME || 'correr_morir',
+  user:     process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD,   // sin fallback — falla si no está definida
   max:      10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
@@ -21,7 +27,6 @@ export const connectDatabase = async (): Promise<void> => {
   console.log('✅ PostgreSQL conectado');
 };
 
-/** Ejecuta el SQL de inicialización si las tablas no existen */
 export const initSchema = async (): Promise<void> => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS players (

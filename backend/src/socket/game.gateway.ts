@@ -1,11 +1,36 @@
 /**
- * Gateway de Socket.IO.
- * Centraliza todos los eventos en tiempo real:
- * unirse, listo, mover, terminar partida, desconectar.
+ * Gateway de Socket.IO con validación de payloads.
  */
 import { Server, Socket }  from 'socket.io';
 import { GameRoomService } from '../services/GameRoom.service';
 import { ScoreService }    from '../services/Score.service';
+
+// ── Validadores de payloads ───────────────────────────────────────────────────
+
+const isValidUsername = (v: unknown): v is string =>
+  typeof v === 'string' && v.trim().length >= 2 && v.trim().length <= 50;
+
+const isValidCharacterId = (v: unknown): v is string =>
+  typeof v === 'string' && ['runner', 'survivor', 'guardian'].includes(v);
+
+const isValidRoomId = (v: unknown): v is string =>
+  typeof v === 'string' && v.length > 0 && v.length <= 100;
+
+const isValidPosition = (v: unknown): v is { x: number; y: number } =>
+  typeof v === 'object' && v !== null &&
+  typeof (v as any).x === 'number' && typeof (v as any).y === 'number' &&
+  isFinite((v as any).x) && isFinite((v as any).y);
+
+const isValidVitality = (v: unknown): v is number =>
+  typeof v === 'number' && v >= 0 && v <= 100 && isFinite(v);
+
+const isValidScore = (v: unknown): v is number =>
+  typeof v === 'number' && v >= 0 && v <= 999999 && isFinite(v);
+
+const isValidDuration = (v: unknown): v is number =>
+  typeof v === 'number' && v >= 0 && v <= 3600 && isFinite(v);
+
+// ── Gateway ───────────────────────────────────────────────────────────────────
 
 interface JoinPayload   { username: string; characterId: string; }
 interface UpdatePayload { roomId: string; position: { x: number; y: number }; vitality: number; score: number; }
@@ -18,17 +43,21 @@ export const setupGameGateway = (io: Server): void => {
   io.on('connection', (socket: Socket) => {
     console.log(`🔌 Conectado: ${socket.id}`);
 
-    // Jugador quiere entrar a una partida
     socket.on('game:join', (payload: JoinPayload) => {
-      const { roomId, existingPlayers } = roomService.joinOrCreateRoom(socket, payload);
-      // Le dice al nuevo jugador su roomId y quiénes ya estaban
+      if (!isValidUsername(payload?.username) || !isValidCharacterId(payload?.characterId)) {
+        socket.emit('game:error', { message: 'Datos de jugador inválidos' });
+        return;
+      }
+      const { roomId, existingPlayers } = roomService.joinOrCreateRoom(socket, {
+        username:    payload.username.trim(),
+        characterId: payload.characterId
+      });
       socket.emit('game:joined', { roomId, socketId: socket.id, existingPlayers });
-      // Avisa SOLO a los jugadores que ya estaban en la sala (no al que acaba de unirse)
       socket.to(roomId).emit('game:player_joined', { socketId: socket.id, ...payload });
     });
 
-    // Jugador confirma que está listo
     socket.on('game:ready', ({ roomId }: { roomId: string }) => {
+      if (!isValidRoomId(roomId)) return;
       const allReady = roomService.setPlayerReady(roomId, socket.id);
       if (allReady) {
         io.to(roomId).emit('game:start_countdown', { countdown: 3 });
@@ -36,22 +65,27 @@ export const setupGameGateway = (io: Server): void => {
       }
     });
 
-    // Actualización de posición cada frame (~30 veces por segundo)
     socket.on('game:player_update', (payload: UpdatePayload) => {
+      if (!isValidRoomId(payload?.roomId)       ||
+          !isValidPosition(payload?.position)   ||
+          !isValidVitality(payload?.vitality)   ||
+          !isValidScore(payload?.score)) return;
+
       roomService.updatePlayerState(payload.roomId, socket.id, {
         position: payload.position,
         vitality: payload.vitality,
         score:    payload.score
       });
-      // Reenvía solo al oponente en la misma sala
       socket.to(payload.roomId).emit('game:opponent_update', {
         socketId: socket.id,
         ...payload
       });
     });
 
-    // Partida terminada → guardar en Oracle
     socket.on('game:end', async (payload: EndPayload) => {
+      if (!isValidRoomId(payload?.roomId) || !isValidDuration(payload?.duration)) return;
+      if (!Array.isArray(payload.players) || payload.players.length > 2) return;
+
       try {
         await scoreService.saveSession({
           roomId:      payload.roomId,
@@ -60,12 +94,11 @@ export const setupGameGateway = (io: Server): void => {
           completedAt: new Date()
         });
         io.to(payload.roomId).emit('game:results', { players: payload.players });
-      } catch (err) {
-        console.error('Error guardando sesión:', err);
+      } catch (err: any) {
+        console.error('Error guardando sesión:', err.message);
       }
     });
 
-    // Jugador se desconecta
     socket.on('disconnect', () => {
       const result = roomService.removePlayer(socket.id);
       if (result) {
