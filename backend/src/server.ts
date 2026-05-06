@@ -4,7 +4,11 @@ import { Server }       from 'socket.io';
 import cors             from 'cors';
 import helmet           from 'helmet';
 import rateLimit        from 'express-rate-limit';
-import dotenv           from 'dotenv';
+import dotenv from 'dotenv';
+import path   from 'path';
+
+// Carga el .env — busca en el directorio donde se ejecuta el comando
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import { connectDatabase, initSchema } from './config/database';
 import { setupGameGateway }            from './socket/game.gateway';
 import scoresRouter                    from './routes/scores.routes';
@@ -85,6 +89,6 @@ const start = async () => {
 };
 
 start().catch(err => {
-  console.error('Error iniciando servidor:', err.message);
+  console.error('Error iniciando servidor:', err);
   process.exit(1);
 });
