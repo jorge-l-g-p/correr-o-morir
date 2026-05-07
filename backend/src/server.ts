@@ -30,12 +30,35 @@ app.use(helmet({
 }));
 
 // CORS estricto — solo permite el origen del frontend
-app.use(cors({
+/*app.use(cors({
   origin: (origin, callback) => {
     // Permite requests sin origin (ej: Postman, curl) solo en desarrollo
     if (!origin && process.env.NODE_ENV !== 'production') return callback(null, true);
     if (origin === FRONTEND_URL) return callback(null, true);
     callback(new Error('CORS: origen no permitido'));
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
+}));*/
+
+const allowedOrigins = [
+  'http://localhost:4200',
+  'http://127.0.0.1:4200'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+
+    console.log('Origin recibido:', origin);
+
+    // Permitir requests sin origin (Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS bloqueado para: ${origin}`));
   },
   methods: ['GET', 'POST'],
   credentials: true
