@@ -234,19 +234,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnCars(): void {
-    // Autos como sprites simples SIN fisica — se mueven manualmente
-    // Esto evita colisiones entre autos
     this.carsGroup = this.add.group() as any;
     const carKeys = ['car_red','car_blue','car_yellow','car_white','car_green','car_black'];
     const cols = Math.floor(WORLD_W / BLOCK_W);
     const rows = Math.floor(WORLD_H / BLOCK_H);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const spd = (90 + Math.random()*80) * (Math.random()>0.5?1:-1);
-        const car = this.add.sprite(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
-          carKeys[Math.floor(Math.random()*carKeys.length)]).setDepth(3).setScale(0.85);
-        this.movingCars.push({ sprite: car as any, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
-        if (c % 3 === 0) {
+        // Auto horizontal — solo en filas pares
+        if (r % 2 === 0) {
+          const spd = (90 + Math.random()*80) * (Math.random()>0.5?1:-1);
+          const car = this.add.sprite(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
+            carKeys[Math.floor(Math.random()*carKeys.length)]).setDepth(3).setScale(0.85);
+          this.movingCars.push({ sprite: car as any, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
+        }
+        // Auto vertical — solo en columnas multiplo de 4
+        if (c % 4 === 0) {
           const spd2 = (90+Math.random()*80)*(Math.random()>0.5?1:-1);
           const car2 = this.add.sprite(c*BLOCK_W+BLOCK_W-18, r*BLOCK_H+BLOCK_H/2,
             carKeys[Math.floor(Math.random()*carKeys.length)]).setDepth(3).setScale(0.85).setAngle(90);
@@ -258,6 +260,8 @@ export class GameScene extends Phaser.Scene {
 
   private tickCars(): void {
     const STEP = 2.5;
+    const HIT_DIST = 30;
+    const now = this.time.now;
     for (const mc of this.movingCars) {
       if (!mc.sprite.active) continue;
       if (mc.axis === 'h') {
@@ -271,6 +275,15 @@ export class GameScene extends Phaser.Scene {
         if (mc.sprite.y < mc.min || mc.sprite.y > mc.max) {
           mc.spd *= -1;
           mc.sprite.setFlipY(mc.spd < 0);
+        }
+      }
+      // Deteccion de colision con jugadores por distancia
+      for (const p of [this.p1, this.p2]) {
+        if (!p || p.dead || p.won) continue;
+        const dx = mc.sprite.x - p.sprite.x;
+        const dy = mc.sprite.y - p.sprite.y;
+        if (Math.sqrt(dx*dx + dy*dy) < HIT_DIST) {
+          this.carHit(p);
         }
       }
     }
