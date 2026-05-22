@@ -87,8 +87,6 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.p1.sprite, this.buildings);
     this.physics.add.collider(this.p2.sprite, this.buildings);
     this.physics.add.collider(this.p1.sprite, this.p2.sprite);
-    this.physics.add.overlap(this.p1.sprite, this.carsGroup, () => this.carHit(this.p1));
-    this.physics.add.overlap(this.p2.sprite, this.carsGroup, () => this.carHit(this.p2));
     this.physics.add.overlap(this.p1.sprite, this.items, (_p, it) => this.pickItem(this.p1, it as Phaser.Physics.Arcade.Sprite));
     this.physics.add.overlap(this.p2.sprite, this.items, (_p, it) => this.pickItem(this.p2, it as Phaser.Physics.Arcade.Sprite));
 
@@ -246,16 +244,14 @@ export class GameScene extends Phaser.Scene {
         const car = this.carsGroup.create(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
           carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
         car.setDepth(3).setScale(0.85);
-        (car.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(false); (car.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
-        car.setVelocityX(spd);
+        car.body!.enable = false;
         this.movingCars.push({ sprite: car, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
         if (c % 3 === 0) {
           const spd2 = (90+Math.random()*80)*(Math.random()>0.5?1:-1);
           const car2 = this.carsGroup.create(c*BLOCK_W+BLOCK_W-18, r*BLOCK_H+BLOCK_H/2,
             carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
           car2.setDepth(3).setScale(0.85).setAngle(90);
-          (car2.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(false); (car2.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
-          car2.setVelocityY(spd2);
+          car2.body!.enable = false;
           this.movingCars.push({ sprite: car2, axis: 'v', min: r*BLOCK_H+10, max: (r+1)*BLOCK_H-10, spd: spd2 });
         }
       }
@@ -263,13 +259,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   private tickCars(): void {
+    const STEP = 2.5;
     for (const mc of this.movingCars) {
       if (!mc.sprite.active) continue;
-      const pos = mc.axis === 'h' ? mc.sprite.x : mc.sprite.y;
-      if (pos < mc.min || pos > mc.max) {
-        mc.spd *= -1;
-        if (mc.axis === 'h') { mc.sprite.setVelocityX(mc.spd); mc.sprite.setFlipX(mc.spd < 0); }
-        else                 { mc.sprite.setVelocityY(mc.spd); mc.sprite.setFlipY(mc.spd < 0); }
+      if (mc.axis === 'h') {
+        mc.sprite.x += mc.spd > 0 ? STEP : -STEP;
+        if (mc.sprite.x < mc.min || mc.sprite.x > mc.max) {
+          mc.spd *= -1;
+          mc.sprite.setFlipX(mc.spd < 0);
+        }
+      } else {
+        mc.sprite.y += mc.spd > 0 ? STEP : -STEP;
+        if (mc.sprite.y < mc.min || mc.sprite.y > mc.max) {
+          mc.spd *= -1;
+          mc.sprite.setFlipY(mc.spd < 0);
+        }
       }
     }
   }
@@ -490,6 +494,11 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
+
+
+
+
 
 
 
