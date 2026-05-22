@@ -371,9 +371,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private carHit(p: Player): void {
-    if (p.dead||p.won) return;
-    p.vitality = Math.max(1, p.vitality-20);
-    this.cam1.flash(300,255,0,0); this.cam1.shake(200,0.012);
+    if (p.dead || p.won) return;
+    const now = this.time.now;
+    if (now - p.lastCarHit < 1500) return;
+    p.lastCarHit = now;
+    p.vitality = Math.max(1, p.vitality - 20);
+    this.cam1.flash(300, 255, 0, 0);
+    this.cam1.shake(200, 0.012);
     this.floatText(p.sprite.x, p.sprite.y, '-20 VIT', '#FF1744');
   }
 
