@@ -121,7 +121,7 @@ export class GameScene extends Phaser.Scene {
       (this.p1.sprite.body as Phaser.Physics.Arcade.Body).speed > 0 ||
       (this.p2.sprite.body as Phaser.Physics.Arcade.Body).speed > 0;
 
-    if (anyMoving) this.tickCars(); else this.stopCars();
+    this.tickCars();
 
     if (this.paused) return;
 
@@ -490,3 +490,4 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
