@@ -246,7 +246,7 @@ export class GameScene extends Phaser.Scene {
         const car = this.carsGroup.create(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
           carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
         car.setDepth(3).setScale(0.85);
-        (car.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(true);
+        (car.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(false); (car.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
         car.setVelocityX(spd);
         this.movingCars.push({ sprite: car, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
         if (c % 3 === 0) {
@@ -254,7 +254,7 @@ export class GameScene extends Phaser.Scene {
           const car2 = this.carsGroup.create(c*BLOCK_W+BLOCK_W-18, r*BLOCK_H+BLOCK_H/2,
             carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
           car2.setDepth(3).setScale(0.85).setAngle(90);
-          (car2.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(true);
+          (car2.body as Phaser.Physics.Arcade.Body).setAllowGravity(false).setImmovable(false); (car2.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
           car2.setVelocityY(spd2);
           this.movingCars.push({ sprite: car2, axis: 'v', min: r*BLOCK_H+10, max: (r+1)*BLOCK_H-10, spd: spd2 });
         }
@@ -490,4 +490,6 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
+
 
