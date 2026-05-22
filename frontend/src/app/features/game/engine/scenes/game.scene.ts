@@ -234,25 +234,23 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnCars(): void {
-    this.carsGroup = this.physics.add.group();
+    // Autos como sprites simples SIN fisica — se mueven manualmente
+    // Esto evita colisiones entre autos
+    this.carsGroup = this.add.group() as any;
     const carKeys = ['car_red','car_blue','car_yellow','car_white','car_green','car_black'];
     const cols = Math.floor(WORLD_W / BLOCK_W);
     const rows = Math.floor(WORLD_H / BLOCK_H);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const spd = (90 + Math.random()*80) * (Math.random()>0.5?1:-1);
-        const car = this.carsGroup.create(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
-          carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
-        car.setDepth(3).setScale(0.85);
-        car.body!.enable = false;
-        this.movingCars.push({ sprite: car, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
+        const car = this.add.sprite(c*BLOCK_W+BLOCK_W/2, r*BLOCK_H+BLOCK_H-18,
+          carKeys[Math.floor(Math.random()*carKeys.length)]).setDepth(3).setScale(0.85);
+        this.movingCars.push({ sprite: car as any, axis: 'h', min: c*BLOCK_W+10, max: (c+1)*BLOCK_W-10, spd });
         if (c % 3 === 0) {
           const spd2 = (90+Math.random()*80)*(Math.random()>0.5?1:-1);
-          const car2 = this.carsGroup.create(c*BLOCK_W+BLOCK_W-18, r*BLOCK_H+BLOCK_H/2,
-            carKeys[Math.floor(Math.random()*carKeys.length)]) as Phaser.Physics.Arcade.Sprite;
-          car2.setDepth(3).setScale(0.85).setAngle(90);
-          car2.body!.enable = false;
-          this.movingCars.push({ sprite: car2, axis: 'v', min: r*BLOCK_H+10, max: (r+1)*BLOCK_H-10, spd: spd2 });
+          const car2 = this.add.sprite(c*BLOCK_W+BLOCK_W-18, r*BLOCK_H+BLOCK_H/2,
+            carKeys[Math.floor(Math.random()*carKeys.length)]).setDepth(3).setScale(0.85).setAngle(90);
+          this.movingCars.push({ sprite: car2 as any, axis: 'v', min: r*BLOCK_H+10, max: (r+1)*BLOCK_H-10, spd: spd2 });
         }
       }
     }
@@ -494,6 +492,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
 
 
 
