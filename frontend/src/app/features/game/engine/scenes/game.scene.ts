@@ -24,6 +24,7 @@ interface Player {
   left:  Phaser.Input.Keyboard.Key;
   right: Phaser.Input.Keyboard.Key;
   lastDir: string;
+  lastCarHit: number;
 }
 
 interface MovingCar {
@@ -326,7 +327,7 @@ export class GameScene extends Phaser.Scene {
     const nameTag = this.add.text(x, y-50, label, { fontSize:'13px', color:'#fff', stroke:'#000', strokeThickness:3, fontStyle:'bold' }).setOrigin(0.5).setDepth(10);
     const vBg  = this.add.rectangle(x, y-38, 44, 8, 0x111111, 0.9).setDepth(10);
     const vBar = this.add.rectangle(x-22, y-38, 44, 8, color).setOrigin(0, 0.5).setDepth(11);
-    return { sprite, nameTag, vBg, vBar, vitality:100, score:0, won:false, dead:false, up, down, left, right, lastDir:'down' };
+    return { sprite, nameTag, vBg, vBar, vitality:100, score:0, won:false, dead:false, up, down, left, right, lastDir:'down', lastCarHit:0 };
   }
 
   private movePlayer(p: Player): void {
@@ -505,6 +506,8 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
+
 
 
 
